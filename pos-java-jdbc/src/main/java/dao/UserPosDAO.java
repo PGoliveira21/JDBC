@@ -17,15 +17,14 @@ public class UserPosDAO {
 		connection = SingleConnection.getConnection();
 	}
 
-	
-	//metodo de salvar no banco de dados
+	// metodo de salvar no banco de dados
 	public void salvar(Userposjava userposjava) {
-		String sql = "insert into userposjava (id, nome, email) values (?,?,?)";
+		String sql = "insert into userposjava (nome, email) values (?,?)";
 		try {
 			PreparedStatement insert = connection.prepareStatement(sql);
-			insert.setLong(1, userposjava.getId());
-			insert.setString(2, userposjava.getNome());
-			insert.setString(3, userposjava.getEmail());
+			
+			insert.setString(1, userposjava.getNome());
+			insert.setString(2, userposjava.getEmail());
 			insert.execute();
 			connection.commit();// salva no banco;
 
@@ -41,50 +40,65 @@ public class UserPosDAO {
 
 	}
 
-	
-	//metodo de buscar os dados no banco de dados
-	public List<Userposjava> listar () throws SQLException{
+	// metodo de buscar os dados no banco de dados
+	public List<Userposjava> listar() throws SQLException {
 		List<Userposjava> list = new ArrayList<Userposjava>();
-		
+
 		String sql = "select * from userposjava";
-		
+
 		PreparedStatement statement = connection.prepareStatement(sql);
 		ResultSet resultado = statement.executeQuery();
-		
+
 		while (resultado.next()) {
-			
-		
-		Userposjava userposjava = new Userposjava();
-		
-		userposjava.setEmail(resultado.getString("email"));
-		userposjava.setNome(resultado.getString("nome"));
-		userposjava.setId(resultado.getLong("id"));
-		
-		list.add(userposjava);
-		
-	}
+
+			Userposjava userposjava = new Userposjava();
+
+			userposjava.setEmail(resultado.getString("email"));
+			userposjava.setNome(resultado.getString("nome"));
+			userposjava.setId(resultado.getLong("id"));
+
+			list.add(userposjava);
+
+		}
 		return list;
-}	
-	//Consultar so um objeto
-	public Userposjava buscar (Long id) throws SQLException{
+	}
+
+	// Consultar so um objeto
+	public Userposjava buscar(Long id) throws SQLException {
 		Userposjava retorno = new Userposjava();
-		
+
 		String sql = "select * from userposjava where id = " + id;
-		
+
 		PreparedStatement statement = connection.prepareStatement(sql);
 		ResultSet resultado = statement.executeQuery();
-		
+
 		while (resultado.next()) {
-			
-		retorno.setEmail(resultado.getString("email"));
-	    retorno.setNome(resultado.getString("nome"));
-		retorno.setId(resultado.getLong("id"));
-		
-		
-		
-	}
+
+			retorno.setEmail(resultado.getString("email"));
+			retorno.setNome(resultado.getString("nome"));
+			retorno.setId(resultado.getLong("id"));
+
+		}
 		return retorno;
-}
-	
-	
+	}
+
+	//metodo de atualização recebendo um objeto UserposJava
+	public void atualizar(Userposjava userposjava) {
+		try {
+
+			String sql = "update userposjava set nome = ? where id = " + userposjava.getId();
+			PreparedStatement statement = connection.prepareStatement(sql);
+			statement.setString(1, userposjava.getNome());
+			statement.execute();
+			connection.commit();
+
+		} catch (Exception e) {
+			try {
+				connection.rollback();
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+		}
+
+	}
 }
